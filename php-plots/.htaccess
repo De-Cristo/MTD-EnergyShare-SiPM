@@ -1,0 +1,88 @@
+# *** This htaccess file has been modified automatically on June 09, 2022 ***
+# As announced in https://cern.service-now.com/service-portal?id=outage&n=OTG0071140 web sites get migrated 
+# to a new infrastructure based on OKD4, with new SSO. There are incompatible differences in web site configuration 
+# between the old and the new infrastructure.
+# Because this htaccess file contained such incompatibilities, it has been modified in a way that works on both
+# old and new infrastructures during the transition period (June 2022).
+#
+# *** If you need to modify this file during the transition period, make sure to apply your changes to both sections
+# below. The site owner received an email with instructions to validate the web site configuration in the new
+# infrastructure. ***
+
+<IfModule auth_openidc_module>
+# This section contains the Apache configuration directives used in the new webeos infrastructure with the new SSO.
+
+## CERN Signle sign-on
+## Uncomment if you want to restrict the access to your files
+#
+# ShibRequireAll On
+# ShibRequireSession On
+# ShibExportAssertion On
+# SSLRequireSSL
+# AuthType Shibboleth
+# 
+# SSLVerifyClient optional
+# SSLVerifyDepth 5
+# SSLOptions +StrictRequire
+# 
+# # Authorized group 
+# Require adfs-group "cms-private"
+
+## END CERN SSO
+
+## Tell Apache this is the web index
+##
+# Put below the path to your index.php (starting from the server root)
+# eg /musella/higgs/index.php
+DirectoryIndex index.php index.html index.htm /<me>/<my-project>/index.php
+
+
+
+AuthType openid-connect
+Require claim cern_roles:view-php-plots
+
+Options +Indexes
+DirectoryIndex index.php index.html index.htm /sewuchte/index.php
+</IfModule>
+
+<IfModule !auth_openidc_module>
+# This section contains the Apache configuration directives used in the legacy webeos infrastructure with the old SSO.
+# It can be removed after June 2022 when  https://cern.service-now.com/service-portal?id=outage&n=OTG0071140 is complete.
+
+## CERN Signle sign-on
+## Uncomment if you want to restrict the access to your files
+#
+# ShibRequireAll On
+# ShibRequireSession On
+# ShibExportAssertion On
+# SSLRequireSSL
+# AuthType Shibboleth
+# 
+# SSLVerifyClient optional
+# SSLVerifyDepth 5
+# SSLOptions +StrictRequire
+# 
+# # Authorized group 
+# Require adfs-group "cms-private"
+
+## END CERN SSO
+
+## Tell Apache this is the web index
+##
+# Put below the path to your index.php (starting from the server root)
+# eg /musella/higgs/index.php
+DirectoryIndex index.php index.html index.htm /<me>/<my-project>/index.php
+
+
+SSLRequireSSL
+AuthType shibboleth
+ShibRequireSession On
+ShibRequireAll On
+ShibExportAssertion Off
+
+Require valid-user
+Require ADFS_GROUP "cms-web-access"
+
+Options +Indexes
+DirectoryIndex index.php index.html index.htm /sewuchte/index.php
+</IfModule>
